@@ -9,38 +9,128 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WatchlistRouteImport } from './routes/watchlist'
+import { Route as TentangRouteImport } from './routes/tentang'
+import { Route as SahamRouteImport } from './routes/saham'
+import { Route as BeritaRouteImport } from './routes/berita'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SahamKodeRouteImport } from './routes/saham.$kode'
 
+const WatchlistRoute = WatchlistRouteImport.update({
+  id: '/watchlist',
+  path: '/watchlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TentangRoute = TentangRouteImport.update({
+  id: '/tentang',
+  path: '/tentang',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SahamRoute = SahamRouteImport.update({
+  id: '/saham',
+  path: '/saham',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BeritaRoute = BeritaRouteImport.update({
+  id: '/berita',
+  path: '/berita',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SahamKodeRoute = SahamKodeRouteImport.update({
+  id: '/$kode',
+  path: '/$kode',
+  getParentRoute: () => SahamRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/berita': typeof BeritaRoute
+  '/saham': typeof SahamRouteWithChildren
+  '/tentang': typeof TentangRoute
+  '/watchlist': typeof WatchlistRoute
+  '/saham/$kode': typeof SahamKodeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/berita': typeof BeritaRoute
+  '/saham': typeof SahamRouteWithChildren
+  '/tentang': typeof TentangRoute
+  '/watchlist': typeof WatchlistRoute
+  '/saham/$kode': typeof SahamKodeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/berita': typeof BeritaRoute
+  '/saham': typeof SahamRouteWithChildren
+  '/tentang': typeof TentangRoute
+  '/watchlist': typeof WatchlistRoute
+  '/saham/$kode': typeof SahamKodeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/berita'
+    | '/saham'
+    | '/tentang'
+    | '/watchlist'
+    | '/saham/$kode'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/berita' | '/saham' | '/tentang' | '/watchlist' | '/saham/$kode'
+  id:
+    | '__root__'
+    | '/'
+    | '/berita'
+    | '/saham'
+    | '/tentang'
+    | '/watchlist'
+    | '/saham/$kode'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BeritaRoute: typeof BeritaRoute
+  SahamRoute: typeof SahamRouteWithChildren
+  TentangRoute: typeof TentangRoute
+  WatchlistRoute: typeof WatchlistRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/watchlist': {
+      id: '/watchlist'
+      path: '/watchlist'
+      fullPath: '/watchlist'
+      preLoaderRoute: typeof WatchlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tentang': {
+      id: '/tentang'
+      path: '/tentang'
+      fullPath: '/tentang'
+      preLoaderRoute: typeof TentangRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/saham': {
+      id: '/saham'
+      path: '/saham'
+      fullPath: '/saham'
+      preLoaderRoute: typeof SahamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/berita': {
+      id: '/berita'
+      path: '/berita'
+      fullPath: '/berita'
+      preLoaderRoute: typeof BeritaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +138,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/saham/$kode': {
+      id: '/saham/$kode'
+      path: '/$kode'
+      fullPath: '/saham/$kode'
+      preLoaderRoute: typeof SahamKodeRouteImport
+      parentRoute: typeof SahamRoute
+    }
   }
 }
 
+interface SahamRouteChildren {
+  SahamKodeRoute: typeof SahamKodeRoute
+}
+
+const SahamRouteChildren: SahamRouteChildren = {
+  SahamKodeRoute: SahamKodeRoute,
+}
+
+const SahamRouteWithChildren = SahamRoute._addFileChildren(SahamRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BeritaRoute: BeritaRoute,
+  SahamRoute: SahamRouteWithChildren,
+  TentangRoute: TentangRoute,
+  WatchlistRoute: WatchlistRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

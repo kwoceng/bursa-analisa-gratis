@@ -12,4 +12,8 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  // Hard-pin the deploy target to Vercel. Zero-config auto-detection (NITRO_PRESET /
+  // VERCEL env) would pick this up anyway on Vercel, but pinning it keeps `vercel build`
+  // deterministic regardless of where it's invoked from.
+  nitro: { preset: "vercel" },
 });

@@ -30,10 +30,9 @@ function TentangPage() {
         </h1>
         <div className="prose prose-slate mt-6 max-w-none text-foreground/90">
           <p>
-            <strong>BursaKita</strong> adalah proyek edukasi yang menghadirkan cara sederhana
-            untuk mempelajari pergerakan saham di Bursa Efek Indonesia. Kami percaya
-            informasi pasar modal seharusnya mudah diakses, gratis, dan tidak membingungkan
-            bagi pemula.
+            <strong>BursaKita</strong> adalah proyek edukasi yang menghadirkan cara sederhana untuk
+            mempelajari pergerakan saham di Bursa Efek Indonesia. Kami percaya informasi pasar modal
+            seharusnya mudah diakses, gratis, dan tidak membingungkan bagi pemula.
           </p>
 
           <h2 className="font-display">Apa yang bisa Anda lakukan di sini</h2>
@@ -48,17 +47,17 @@ function TentangPage() {
           <h2 className="font-display">Sumber data</h2>
           <p>
             Seluruh data yang ditampilkan saat ini merupakan <em>data demonstrasi</em> yang
-            dirancang menyerupai kondisi pasar nyata, namun bukan angka perdagangan aktual di
-            BEI. Ini memungkinkan Anda mencoba antarmuka dan alur analisa tanpa
-            ketergantungan pada penyedia data pihak ketiga.
+            dirancang menyerupai kondisi pasar nyata, namun bukan angka perdagangan aktual di BEI.
+            Ini memungkinkan Anda mencoba antarmuka dan alur analisa tanpa ketergantungan pada
+            penyedia data pihak ketiga.
           </p>
 
           <h2 className="font-display">Disclaimer penting</h2>
           <p>
-            Konten pada situs ini <strong>bukan rekomendasi jual atau beli</strong> maupun
-            nasihat investasi. Investasi di pasar modal mengandung risiko, termasuk potensi
-            kehilangan sebagian atau seluruh modal. Selalu lakukan riset independen dan/atau
-            berkonsultasi dengan penasihat keuangan berlisensi sebelum mengambil keputusan.
+            Konten pada situs ini <strong>bukan rekomendasi jual atau beli</strong> maupun nasihat
+            investasi. Investasi di pasar modal mengandung risiko, termasuk potensi kehilangan
+            sebagian atau seluruh modal. Selalu lakukan riset independen dan/atau berkonsultasi
+            dengan penasihat keuangan berlisensi sebelum mengambil keputusan.
           </p>
         </div>
 

@@ -5,6 +5,7 @@ import { SiteShell } from "@/components/layout/SiteShell";
 import { MarketSummary } from "@/components/market/MarketSummary";
 import { StockTable } from "@/components/market/StockTable";
 import { sectors, stocks } from "@/data/stocks";
+import { useLiveStockQuotes } from "@/hooks/use-live-quotes";
 
 export const Route = createFileRoute("/saham")({
   head: () => ({
@@ -28,6 +29,7 @@ export const Route = createFileRoute("/saham")({
 function SahamPage() {
   const [q, setQ] = useState("");
   const [sektor, setSektor] = useState<string>("Semua");
+  const { byKode: liveByKode } = useLiveStockQuotes();
 
   const filtered = useMemo(() => {
     const query = q.trim().toLowerCase();
@@ -48,8 +50,8 @@ function SahamPage() {
             Daftar saham Bursa Efek Indonesia
           </h1>
           <p className="mt-3 text-muted-foreground">
-            Cari berdasarkan kode atau nama, dan filter berdasarkan sektor untuk melihat
-            performa terbaru.
+            Cari berdasarkan kode atau nama, dan filter berdasarkan sektor untuk melihat performa
+            terbaru.
           </p>
         </div>
 
@@ -69,7 +71,11 @@ function SahamPage() {
             />
           </div>
           <div className="flex gap-2 overflow-x-auto">
-            <SectorChip label="Semua" active={sektor === "Semua"} onClick={() => setSektor("Semua")} />
+            <SectorChip
+              label="Semua"
+              active={sektor === "Semua"}
+              onClick={() => setSektor("Semua")}
+            />
             {sectors.map((s) => (
               <SectorChip key={s} label={s} active={sektor === s} onClick={() => setSektor(s)} />
             ))}
@@ -77,12 +83,12 @@ function SahamPage() {
         </div>
 
         <p className="mt-4 text-xs text-muted-foreground">
-          Menampilkan <span className="font-medium text-foreground">{filtered.length}</span>{" "}
-          dari {stocks.length} saham
+          Menampilkan <span className="font-medium text-foreground">{filtered.length}</span> dari{" "}
+          {stocks.length} saham
         </p>
 
         <div className="mt-3">
-          <StockTable data={filtered} />
+          <StockTable data={filtered} liveByKode={liveByKode} />
         </div>
       </div>
     </SiteShell>

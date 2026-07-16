@@ -17,7 +17,11 @@ export function PriceChange({
   const cls = up ? "text-up" : down ? "text-down" : "text-muted-foreground";
   const bg = up ? "bg-up-soft" : down ? "bg-down-soft" : "bg-muted";
   const sizeCls =
-    size === "sm" ? "text-xs px-1.5 py-0.5" : size === "lg" ? "text-sm px-2.5 py-1" : "text-xs px-2 py-0.5";
+    size === "sm"
+      ? "text-xs px-1.5 py-0.5"
+      : size === "lg"
+        ? "text-sm px-2.5 py-1"
+        : "text-xs px-2 py-0.5";
   const Icon = up ? ArrowUpRight : down ? ArrowDownRight : Minus;
   const sign = up ? "+" : "";
   return (

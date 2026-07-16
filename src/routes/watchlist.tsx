@@ -27,9 +27,7 @@ export const Route = createFileRoute("/watchlist")({
 
 function WatchlistPage() {
   const { items, remove, hydrated } = useWatchlist();
-  const rows = items
-    .map((k) => getStock(k))
-    .filter((s): s is NonNullable<typeof s> => Boolean(s));
+  const rows = items.map((k) => getStock(k)).filter((s): s is NonNullable<typeof s> => Boolean(s));
 
   return (
     <SiteShell>
@@ -39,8 +37,8 @@ function WatchlistPage() {
           Watchlist saya
         </h1>
         <p className="mt-3 max-w-2xl text-muted-foreground">
-          Daftar saham yang Anda simpan disimpan lokal di peramban ini. Bersihkan riwayat
-          peramban akan menghapus watchlist.
+          Daftar saham yang Anda simpan disimpan lokal di peramban ini. Bersihkan riwayat peramban
+          akan menghapus watchlist.
         </p>
 
         {!hydrated && (
@@ -96,9 +94,16 @@ function WatchlistPage() {
                     <td className="hidden max-w-[280px] truncate px-3 py-3 text-muted-foreground md:table-cell">
                       {s.nama}
                     </td>
-                    <td className="px-3 py-3 text-right tabular-nums">Rp {formatRupiah(s.harga)}</td>
+                    <td className="px-3 py-3 text-right tabular-nums">
+                      Rp {formatRupiah(s.harga)}
+                    </td>
                     <td className="px-3 py-3 text-right">
-                      <PriceChange value={s.perubahan} percent={s.perubahanPersen} size="sm" showAbsolute={false} />
+                      <PriceChange
+                        value={s.perubahan}
+                        percent={s.perubahanPersen}
+                        size="sm"
+                        showAbsolute={false}
+                      />
                     </td>
                     <td className="hidden px-3 py-3 text-right tabular-nums text-muted-foreground sm:table-cell">
                       {formatVolume(s.volume)}

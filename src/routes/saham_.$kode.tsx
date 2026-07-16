@@ -1,13 +1,17 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft } from "lucide-react";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { PriceChange } from "@/components/market/PriceChange";
 import { StockChart } from "@/components/stock/StockChart";
 import { WatchlistButton } from "@/components/stock/WatchlistButton";
 import { generateHistory, getStock } from "@/data/stocks";
+import { getStockHistory } from "@/lib/quotes.functions";
+import { useLiveStockQuotes, mergeLiveStock } from "@/hooks/use-live-quotes";
 import { formatMarketCap, formatRupiah, formatVolume } from "@/lib/format";
 
-export const Route = createFileRoute("/saham/$kode")({
+export const Route = createFileRoute("/saham_/$kode")({
   loader: ({ params }) => {
     const stock = getStock(params.kode);
     if (!stock) throw notFound();
@@ -73,7 +77,20 @@ function NotFoundStock() {
 }
 
 function StockDetail() {
-  const { stock, history } = Route.useLoaderData();
+  const { stock: baseStock, history: demoHistory } = Route.useLoaderData();
+  const { byKode: liveByKode } = useLiveStockQuotes();
+  const stock = mergeLiveStock(baseStock, liveByKode.get(baseStock.kode));
+
+  const fetchHistory = useServerFn(getStockHistory);
+  const { data: historyData } = useQuery({
+    queryKey: ["stock-history", stock.kode],
+    queryFn: () => fetchHistory({ data: stock.kode }),
+    refetchInterval: 60_000,
+    staleTime: 30_000,
+  });
+  const liveHistory = historyData?.points ?? [];
+  const isHistoryLive = liveHistory.length > 0;
+  const history = isHistoryLive ? liveHistory : demoHistory;
   const positive = stock.perubahanPersen >= 0;
 
   return (
@@ -95,6 +112,12 @@ function StockDetail() {
               <span className="rounded-full bg-accent px-2.5 py-1 text-xs font-medium text-accent-foreground">
                 {stock.sektor}
               </span>
+              {stock.isLive && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-up-soft px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-up">
+                  <span className="h-1.5 w-1.5 rounded-full bg-up animate-pulse" />
+                  LIVE
+                </span>
+              )}
             </div>
             <p className="mt-1 text-lg text-muted-foreground">{stock.nama}</p>
           </div>
@@ -111,9 +134,11 @@ function StockDetail() {
         <div className="mt-8 rounded-xl border border-border/60 bg-card p-4 shadow-sm sm:p-6">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="font-display text-base font-semibold text-foreground">
-              Pergerakan 30 hari
+              Pergerakan {isHistoryLive ? "3 bulan" : "30 hari"}
             </h2>
-            <span className="text-xs text-muted-foreground">Harga penutupan harian (demo)</span>
+            <span className="text-xs text-muted-foreground">
+              Harga penutupan harian ({isHistoryLive ? "Yahoo Finance" : "demo"})
+            </span>
           </div>
           <StockChart data={history} positive={positive} />
         </div>
@@ -138,8 +163,8 @@ function StockDetail() {
         </div>
 
         <p className="mt-6 text-xs text-muted-foreground">
-          Data ditampilkan untuk kebutuhan edukasi dan tidak mencerminkan harga perdagangan
-          aktual. Bukan rekomendasi investasi.
+          Data ditampilkan untuk kebutuhan edukasi dan tidak mencerminkan harga perdagangan aktual.
+          Bukan rekomendasi investasi.
         </p>
       </div>
     </SiteShell>

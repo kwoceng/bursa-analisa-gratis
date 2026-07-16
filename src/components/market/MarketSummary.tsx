@@ -103,9 +103,9 @@ export function MarketSummary() {
         })}
       </div>
       <p className="mt-2 text-[11px] text-muted-foreground">
-        Sumber IHSG: Yahoo Finance (<code>^JKSE</code>), diperbarui otomatis tiap 30 detik.
-        LQ45, IDX30, dan IDXBUMN20 masih data demo karena tidak tersedia sebagai simbol
-        gratis di Yahoo Finance.
+        Sumber IHSG: Yahoo Finance (<code>^JKSE</code>), diperbarui otomatis tiap 30 detik. LQ45,
+        IDX30, dan IDXBUMN20 masih data demo karena tidak tersedia sebagai simbol gratis di Yahoo
+        Finance.
       </p>
     </div>
   );

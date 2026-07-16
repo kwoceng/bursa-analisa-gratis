@@ -2,17 +2,32 @@ import { Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import type { Stock } from "@/data/stocks";
+import type { LiveStockQuote } from "@/lib/quotes.functions";
+import { mergeLiveStock } from "@/hooks/use-live-quotes";
 import { formatMarketCap, formatRupiah, formatVolume } from "@/lib/format";
 import { PriceChange } from "./PriceChange";
 
 type SortKey = "kode" | "harga" | "perubahanPersen" | "volume" | "marketCap";
 
-export function StockTable({ data, compact = false }: { data: Stock[]; compact?: boolean }) {
+export function StockTable({
+  data,
+  compact = false,
+  liveByKode,
+}: {
+  data: Stock[];
+  compact?: boolean;
+  liveByKode?: Map<string, LiveStockQuote>;
+}) {
   const [sortKey, setSortKey] = useState<SortKey>("marketCap");
   const [asc, setAsc] = useState(false);
 
+  const merged = useMemo(
+    () => data.map((s) => mergeLiveStock(s, liveByKode?.get(s.kode))),
+    [data, liveByKode],
+  );
+
   const sorted = useMemo(() => {
-    const arr = [...data];
+    const arr = [...merged];
     arr.sort((a, b) => {
       const av = a[sortKey];
       const bv = b[sortKey];
@@ -22,7 +37,7 @@ export function StockTable({ data, compact = false }: { data: Stock[]; compact?:
       return asc ? (av as number) - (bv as number) : (bv as number) - (av as number);
     });
     return arr;
-  }, [data, sortKey, asc]);
+  }, [merged, sortKey, asc]);
 
   const toggleSort = (k: SortKey) => {
     if (sortKey === k) setAsc(!asc);
@@ -32,15 +47,29 @@ export function StockTable({ data, compact = false }: { data: Stock[]; compact?:
     }
   };
 
-  const Th = ({ k, label, align = "right" }: { k: SortKey; label: string; align?: "left" | "right" }) => (
+  const Th = ({
+    k,
+    label,
+    align = "right",
+  }: {
+    k: SortKey;
+    label: string;
+    align?: "left" | "right";
+  }) => (
     <th
       className={`cursor-pointer select-none px-3 py-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground ${align === "right" ? "text-right" : "text-left"}`}
       onClick={() => toggleSort(k)}
     >
-      <span className={`inline-flex items-center gap-1 ${align === "right" ? "flex-row-reverse" : ""}`}>
+      <span
+        className={`inline-flex items-center gap-1 ${align === "right" ? "flex-row-reverse" : ""}`}
+      >
         {label}
         {sortKey === k ? (
-          asc ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />
+          asc ? (
+            <ChevronUp className="h-3 w-3" />
+          ) : (
+            <ChevronDown className="h-3 w-3" />
+          )
         ) : null}
       </span>
     </th>
@@ -65,13 +94,17 @@ export function StockTable({ data, compact = false }: { data: Stock[]; compact?:
           {sorted.map((s) => (
             <tr key={s.kode} className="group transition-colors hover:bg-muted/40">
               <td className="px-3 py-3">
-                <Link
-                  to="/saham/$kode"
-                  params={{ kode: s.kode }}
-                  className="flex flex-col"
-                >
-                  <span className="font-display text-sm font-semibold text-foreground group-hover:text-primary">
-                    {s.kode}
+                <Link to="/saham/$kode" params={{ kode: s.kode }} className="flex flex-col">
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="font-display text-sm font-semibold text-foreground group-hover:text-primary">
+                      {s.kode}
+                    </span>
+                    {s.isLive && (
+                      <span
+                        className="h-1.5 w-1.5 rounded-full bg-up animate-pulse"
+                        title="Harga live"
+                      />
+                    )}
                   </span>
                   <span className="text-[11px] text-muted-foreground md:hidden">{s.nama}</span>
                 </Link>
@@ -86,7 +119,12 @@ export function StockTable({ data, compact = false }: { data: Stock[]; compact?:
                 {formatRupiah(s.harga)}
               </td>
               <td className="px-3 py-3 text-right">
-                <PriceChange value={s.perubahan} percent={s.perubahanPersen} size="sm" showAbsolute={false} />
+                <PriceChange
+                  value={s.perubahan}
+                  percent={s.perubahanPersen}
+                  size="sm"
+                  showAbsolute={false}
+                />
               </td>
               {!compact && (
                 <td className="px-3 py-3 text-right tabular-nums text-muted-foreground">

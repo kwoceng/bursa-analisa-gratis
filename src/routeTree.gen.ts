@@ -14,7 +14,7 @@ import { Route as TentangRouteImport } from './routes/tentang'
 import { Route as SahamRouteImport } from './routes/saham'
 import { Route as BeritaRouteImport } from './routes/berita'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as SahamKodeRouteImport } from './routes/saham.$kode'
+import { Route as SahamKodeRouteImport } from './routes/saham_.$kode'
 
 const WatchlistRoute = WatchlistRouteImport.update({
   id: '/watchlist',
@@ -42,15 +42,15 @@ const IndexRoute = IndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const SahamKodeRoute = SahamKodeRouteImport.update({
-  id: '/$kode',
-  path: '/$kode',
-  getParentRoute: () => SahamRoute,
+  id: '/saham_/$kode',
+  path: '/saham/$kode',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/berita': typeof BeritaRoute
-  '/saham': typeof SahamRouteWithChildren
+  '/saham': typeof SahamRoute
   '/tentang': typeof TentangRoute
   '/watchlist': typeof WatchlistRoute
   '/saham/$kode': typeof SahamKodeRoute
@@ -58,7 +58,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/berita': typeof BeritaRoute
-  '/saham': typeof SahamRouteWithChildren
+  '/saham': typeof SahamRoute
   '/tentang': typeof TentangRoute
   '/watchlist': typeof WatchlistRoute
   '/saham/$kode': typeof SahamKodeRoute
@@ -67,20 +67,15 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/berita': typeof BeritaRoute
-  '/saham': typeof SahamRouteWithChildren
+  '/saham': typeof SahamRoute
   '/tentang': typeof TentangRoute
   '/watchlist': typeof WatchlistRoute
-  '/saham/$kode': typeof SahamKodeRoute
+  '/saham_/$kode': typeof SahamKodeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
-    | '/berita'
-    | '/saham'
-    | '/tentang'
-    | '/watchlist'
-    | '/saham/$kode'
+    '/' | '/berita' | '/saham' | '/tentang' | '/watchlist' | '/saham/$kode'
   fileRoutesByTo: FileRoutesByTo
   to: '/' | '/berita' | '/saham' | '/tentang' | '/watchlist' | '/saham/$kode'
   id:
@@ -90,15 +85,16 @@ export interface FileRouteTypes {
     | '/saham'
     | '/tentang'
     | '/watchlist'
-    | '/saham/$kode'
+    | '/saham_/$kode'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BeritaRoute: typeof BeritaRoute
-  SahamRoute: typeof SahamRouteWithChildren
+  SahamRoute: typeof SahamRoute
   TentangRoute: typeof TentangRoute
   WatchlistRoute: typeof WatchlistRoute
+  SahamKodeRoute: typeof SahamKodeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -138,33 +134,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/saham/$kode': {
-      id: '/saham/$kode'
-      path: '/$kode'
+    '/saham_/$kode': {
+      id: '/saham_/$kode'
+      path: '/saham/$kode'
       fullPath: '/saham/$kode'
       preLoaderRoute: typeof SahamKodeRouteImport
-      parentRoute: typeof SahamRoute
+      parentRoute: typeof rootRouteImport
     }
   }
 }
 
-interface SahamRouteChildren {
-  SahamKodeRoute: typeof SahamKodeRoute
-}
-
-const SahamRouteChildren: SahamRouteChildren = {
-  SahamKodeRoute: SahamKodeRoute,
-}
-
-const SahamRouteWithChildren = SahamRoute._addFileChildren(SahamRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BeritaRoute: BeritaRoute,
-  SahamRoute: SahamRouteWithChildren,
+  SahamRoute: SahamRoute,
   TentangRoute: TentangRoute,
   WatchlistRoute: WatchlistRoute,
+  SahamKodeRoute: SahamKodeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

@@ -54,8 +54,8 @@ export function StockChart({
               fontSize: 12,
             }}
             labelStyle={{ color: "var(--color-muted-foreground)" }}
-            formatter={(v: number) => [
-              "Rp " + new Intl.NumberFormat("id-ID").format(Math.round(v)),
+            formatter={(v) => [
+              "Rp " + new Intl.NumberFormat("id-ID").format(Math.round(Number(v))),
               "Harga",
             ]}
           />
